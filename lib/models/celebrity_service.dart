@@ -23,6 +23,7 @@ class CelebrityStatus extends ModelBase {
   factory CelebrityStatus.fromJson(Map<String, dynamic> json) =>
       _$CelebrityStatusFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$CelebrityStatusToJson(this);
 
   @override

@@ -21,6 +21,7 @@ class Person extends ModelBase {
 
   factory Person.fromJson(Map<String, dynamic> json) => _$PersonFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$PersonToJson(this);
 
   @override

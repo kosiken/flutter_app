@@ -19,6 +19,7 @@ class Category extends ModelBase {
   factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$CategoryToJson(this);
 
   @override
