@@ -9,9 +9,11 @@ void main() {
 
     var btn = Directionality(
         textDirection: TextDirection.ltr,
-        child: AppButton("Button", onTapped: () {
-          number = 10;
-        }));
+        child: AppButton(
+            text: "Button",
+            onTapped: () {
+              number = 10;
+            }));
     await tester.pumpWidget(btn);
     expect(find.text("Button"), findsOneWidget);
     await tester.tap(find.text("Button"));

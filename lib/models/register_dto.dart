@@ -8,10 +8,14 @@ part 'register_dto.g.dart';
 class RegisterDTO extends ModelBase {
   String firstName = "";
   String lastName = "";
-  String aka = "";
+  String celebrityAKA = "";
   String phoneNumber = "";
+  String location = "";
   String countryOfResidence = "";
-  Category? primaryCelebrityCategory;
+  String email = "";
+
+  @JsonKey(toJson: categoryToJson)
+  late Category primaryCelebrityCategory;
   String password = "";
 
   RegisterDTO(); // empty constructor
@@ -23,6 +27,7 @@ class RegisterDTO extends ModelBase {
   @override
   Map<String, dynamic> toJson() => _$RegisterDTOToJson(this);
 
-  factory RegisterDTO.fromJson(Map<String, dynamic> json) =>
-      _$RegisterDTOFromJson(json);
+  static int categoryToJson(Category category) {
+    return category.id;
+  }
 }

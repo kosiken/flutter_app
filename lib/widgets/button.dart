@@ -12,19 +12,23 @@ class AppButton extends StatelessWidget {
   final Color? borderColor;
   final ButtonType buttonType;
   final double borderRadius;
+
   final String text;
   final Widget? left;
+  final Widget? child;
   final OnTappedCallback onTapped;
   final OnLongPressedCallback? onLongPressed;
 
-  const AppButton(this.text,
+  const AppButton(
       {Key? key,
       this.borderColor,
+      this.child,
+      this.text = "",
       this.buttonBgColor,
       this.buttonColor,
       this.left,
       required this.onTapped,
-      this.borderRadius = 25,
+      this.borderRadius = 27.5,
       this.onLongPressed,
       this.buttonType = ButtonType.primary})
       : super(key: key);
@@ -38,15 +42,16 @@ class AppButton extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            height: 50,
+            height: 55,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
               color: colors[1],
               border: Border.all(color: colors[2], width: 1),
             ),
-            child: Center(
-              child: AppTypography(text: text, textColor: colors[0]),
-            ),
+            child: child ??
+                Center(
+                  child: AppTypography(text: text, textColor: colors[0]),
+                ),
           ),
           Positioned(
             child: left ?? const SizedBox(),

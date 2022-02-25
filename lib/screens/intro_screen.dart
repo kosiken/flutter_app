@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/constants/colors.dart';
+import 'package:flutter_app/constants/text.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/typography.dart';
@@ -40,15 +41,15 @@ class IntroScreen extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                height: 25,
-                width: 25,
+                height: 30,
+                width: 30,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(12.5)),
                   border: Border.all(color: greenColor, width: 0.5),
                 ),
                 child: const Icon(
                   Icons.volume_up,
-                  size: 10,
+                  size: 15,
                   color: greenColor,
                 ),
               ),
@@ -67,13 +68,12 @@ class IntroScreen extends StatelessWidget {
               ),
               Helpers.createSpacer(y: 20),
               const AppTypography(
-                text:
-                    "Amaze   We help bridge the gap between celebrities and their fans.",
+                text: introScreenAmazeCopy,
                 textColor: Colors.white,
               ),
               Helpers.createSpacer(y: 20),
               AppButton(
-                "Login",
+                text: login,
                 onTapped: () {
                   Navigator.of(context).pushNamed("/login");
                 },
@@ -84,7 +84,7 @@ class IntroScreen extends StatelessWidget {
               ),
               Helpers.createSpacer(y: 20),
               AppButton(
-                "Create an Account",
+                text: createAnAccount,
                 onTapped: () {
                   Navigator.of(context).pushNamed("/signup");
                 },

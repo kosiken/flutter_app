@@ -33,7 +33,7 @@ class AppTypography extends StatelessWidget {
     double size = 0;
     switch (textType) {
       case TextTypes.small:
-        size = 10;
+        size = 12;
         break;
       case TextTypes.body:
         size = 14;

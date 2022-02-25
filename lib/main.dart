@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/screens/intro_screen.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter_app/screens/register_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return IntroScreen();
+    return RegisterScreen();
   }
 }
 

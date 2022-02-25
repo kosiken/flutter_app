@@ -1,4 +1,6 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/widgets/typography.dart';
 import 'package:flutter_app/constants/colors.dart';
 
@@ -9,7 +11,8 @@ const AppTextInputFocusedBgColor = Color.fromRGBO(0xE6, 0x00, 0x7E, 0.05);
 class AppTextInput extends StatefulWidget {
   final String label;
   final TextInputType inputType;
-  final String? warning;
+  final EdgeInsets? padding;
+  final String warning;
   final Widget? left;
   final Widget? right;
   final bool secure;
@@ -24,7 +27,8 @@ class AppTextInput extends StatefulWidget {
     Key? key,
     required this.label,
     this.inputType = TextInputType.text,
-    this.warning,
+    this.warning = "",
+    this.padding,
     this.left,
     this.defaultValue = "",
     this.right,
@@ -40,11 +44,14 @@ class AppTextInput extends StatefulWidget {
   _AppTextInputState createState() => _AppTextInputState();
 }
 
-class _AppTextInputState extends State<AppTextInput> {
+class _AppTextInputState extends State<AppTextInput>
+    with AfterLayoutMixin<AppTextInput> {
   FocusNode focusNode = FocusNode();
   late TextEditingController controller;
   Color bgColor = Colors.white;
+  GlobalKey containerKey = GlobalKey(debugLabel: "input box");
   Color color = textInputColor;
+  double warningTextWidth = 150;
   @override
   void initState() {
     super.initState();
@@ -57,69 +64,82 @@ class _AppTextInputState extends State<AppTextInput> {
   @override
   Widget build(BuildContext context) {
     Color primaryColor = Theme.of(context).primaryColor;
-    return ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 150),
-        child: Stack(
-          clipBehavior: Clip.none,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Column(
           children: [
-            Column(children: [
+            Container(
+              key: containerKey,
+              padding: widget.padding ??
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+              decoration: BoxDecoration(
+                border: Border.all(color: color, width: 1.5),
+                color: bgColor,
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
+              ),
+              child: Row(
+                children: [
+                  widget.left ?? const SizedBox(),
+                  Expanded(
+                      child: TextField(
+                    buildCounter: (BuildContext ctx,
+                            {required int currentLength,
+                            required bool isFocused,
+                            required int? maxLength}) =>
+                        const SizedBox(),
+                    focusNode: focusNode,
+                    maxLines: (widget.inputType == TextInputType.multiline
+                        ? null
+                        : widget.lines),
+                    maxLength: widget.maxLength,
+                    enabled: !(widget.disabled ?? false),
+                    controller: controller,
+                    obscureText: widget.secure,
+                    autofocus: false,
+                    decoration: const InputDecoration.collapsed(
+                      hintText: "",
+                    ),
+                    keyboardType: widget.inputType,
+                    onChanged: widget.onChange,
+                  )),
+                  widget.right ?? const SizedBox(),
+                ],
+              ),
+            ),
+            if (widget.warning.isNotEmpty)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                decoration: BoxDecoration(
-                  border: Border.all(color: color, width: 1),
-                  color: bgColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(5)),
-                ),
+                width:
+                    warningTextWidth, // we need the width to be the same as the input container
+                padding: const EdgeInsets.only(top: 5),
                 child: Row(
                   children: [
-                    widget.left ?? const SizedBox(),
+                    Icon(Icons.info_outline, color: primaryColor),
+                    Helpers.createSpacer(x: 5),
                     Expanded(
-                        child: TextField(
-                      focusNode: focusNode,
-                      maxLines: (widget.inputType == TextInputType.multiline
-                          ? null
-                          : widget.lines),
-                      maxLength: widget.maxLength,
-                      enabled: !(widget.disabled ?? false),
-                      controller: controller,
-                      obscureText: widget.secure,
-                      autofocus: false,
-                      decoration: const InputDecoration.collapsed(
-                        hintText: "",
-                      ),
-                      keyboardType: widget.inputType,
-                      onChanged: widget.onChange,
-                    )),
-                    widget.right ?? const SizedBox(),
+                        child: AppTypography(
+                      text: widget.warning,
+                      textColor: primaryColor,
+                      textType: TextTypes.small,
+                    ))
                   ],
                 ),
               ),
-              if (widget.warning != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: primaryColor),
-                      AppTypography(
-                        text: widget.warning!,
-                        textColor: primaryColor,
-                      )
-                    ],
-                  ),
-                )
-            ]),
-            Positioned(
-              child: AppTypography(
-                text: widget.label,
-                textColor: color,
-                bgColor: Colors.white,
-              ),
-              left: 10,
-              top: -8,
-            ),
           ],
-        ));
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        Positioned(
+          child: AppTypography(
+            text: widget.label,
+            textColor: color,
+            bgColor: Colors.white,
+          ),
+          left: 10,
+          top: -8,
+        ),
+      ],
+    );
   }
 
   _focusChangeColor() {
@@ -139,6 +159,15 @@ class _AppTextInputState extends State<AppTextInput> {
     focusNode.removeListener(_focusChangeColor);
     focusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    var size = containerKey.currentContext!.size;
+    if (size == null) return;
+    setState(() {
+      warningTextWidth = size.width;
+    });
   }
 }
 
