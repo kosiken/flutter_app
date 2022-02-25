@@ -4,29 +4,29 @@ import 'package:flutter_app/constants/colors.dart';
 
 typedef InputOnChangeCallback = void Function(String value);
 
-const textInputFocusedBgColor = Color.fromRGBO(0xE6, 0x00, 0x7E, 0.05);
+const AppTextInputFocusedBgColor = Color.fromRGBO(0xE6, 0x00, 0x7E, 0.05);
 
-class TextInput extends StatefulWidget {
-  final TextEditingController? controller;
+class AppTextInput extends StatefulWidget {
   final String label;
   final TextInputType inputType;
   final String? warning;
   final Widget? left;
   final Widget? right;
   final bool secure;
+  final String defaultValue;
   final double margin;
   final int lines;
   final bool? disabled;
   final int? maxLength;
   final InputOnChangeCallback? onChange;
 
-  const TextInput({
+  const AppTextInput({
     Key? key,
     required this.label,
     this.inputType = TextInputType.text,
-    this.controller,
     this.warning,
     this.left,
+    this.defaultValue = "",
     this.right,
     this.maxLength,
     this.margin = 0,
@@ -37,88 +37,95 @@ class TextInput extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _TextInputState createState() => _TextInputState();
+  _AppTextInputState createState() => _AppTextInputState();
 }
 
-class _TextInputState extends State<TextInput> {
+class _AppTextInputState extends State<AppTextInput> {
   FocusNode focusNode = FocusNode();
+  late TextEditingController controller;
   Color bgColor = Colors.white;
   Color color = textInputColor;
   @override
   void initState() {
     super.initState();
     focusNode.addListener(_focusChangeColor);
+    setState(() {
+      controller = TextEditingController(text: widget.defaultValue);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     Color primaryColor = Theme.of(context).primaryColor;
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Column(children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-            decoration: BoxDecoration(
-              border: Border.all(color: color, width: 1),
-              color: bgColor,
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
-            ),
-            child: Row(
-              children: [
-                widget.left ?? const SizedBox(),
-                Expanded(
-                    child: TextField(
-                  focusNode: focusNode,
-                  maxLines: (widget.inputType == TextInputType.multiline
-                      ? null
-                      : widget.lines),
-                  maxLength: widget.maxLength,
-                  enabled: !(widget.disabled ?? false),
-                  controller: widget.controller,
-                  obscureText: widget.secure,
-                  autofocus: false,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: "",
-                  ),
-                  keyboardType: widget.inputType,
-                  onChanged: widget.onChange,
-                )),
-                widget.right ?? const SizedBox(),
-              ],
-            ),
-          ),
-          if (widget.warning != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: primaryColor),
-                  AppTypography(
-                    text: widget.warning!,
-                    textColor: primaryColor,
-                  )
-                ],
+    return ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 150),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Column(children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                decoration: BoxDecoration(
+                  border: Border.all(color: color, width: 1),
+                  color: bgColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(5)),
+                ),
+                child: Row(
+                  children: [
+                    widget.left ?? const SizedBox(),
+                    Expanded(
+                        child: TextField(
+                      focusNode: focusNode,
+                      maxLines: (widget.inputType == TextInputType.multiline
+                          ? null
+                          : widget.lines),
+                      maxLength: widget.maxLength,
+                      enabled: !(widget.disabled ?? false),
+                      controller: controller,
+                      obscureText: widget.secure,
+                      autofocus: false,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: "",
+                      ),
+                      keyboardType: widget.inputType,
+                      onChanged: widget.onChange,
+                    )),
+                    widget.right ?? const SizedBox(),
+                  ],
+                ),
               ),
-            )
-        ]),
-        Positioned(
-          child: AppTypography(
-            text: widget.label,
-            textColor: color,
-            bgColor: Colors.white,
-          ),
-          left: 10,
-          top: -8,
-        ),
-      ],
-    );
+              if (widget.warning != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: primaryColor),
+                      AppTypography(
+                        text: widget.warning!,
+                        textColor: primaryColor,
+                      )
+                    ],
+                  ),
+                )
+            ]),
+            Positioned(
+              child: AppTypography(
+                text: widget.label,
+                textColor: color,
+                bgColor: Colors.white,
+              ),
+              left: 10,
+              top: -8,
+            ),
+          ],
+        ));
   }
 
   _focusChangeColor() {
     setState(() {
       if (focusNode.hasFocus) {
-        bgColor = textInputFocusedBgColor;
+        bgColor = AppTextInputFocusedBgColor;
         color = Theme.of(context).primaryColor;
       } else {
         bgColor = Colors.white;

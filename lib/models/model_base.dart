@@ -1,7 +1,5 @@
 abstract class ModelBase {
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError();
-  }
+  Map<String, dynamic> toJson();
 
   const ModelBase();
 

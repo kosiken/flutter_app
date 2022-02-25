@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/constants/colors.dart';
-import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/screens/intro_screen.dart';
-import 'package:flutter_app/widgets/Page.dart';
-import 'package:flutter_app/widgets/button.dart';
-import 'package:flutter_app/widgets/text_input.dart';
-import 'package:flutter_app/widgets/typography.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 void main() {
