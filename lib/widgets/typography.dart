@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/debug.dart';
 
 enum TextTypes { body, header, small }
@@ -23,7 +24,12 @@ class AppTypography extends StatelessWidget {
       this.textType = TextTypes.body})
       : super(key: key);
 
-  TextStyle _generateTextStyle(BuildContext context) {
+  static TextStyle generateTextStyle(
+      {TextTypes textType = TextTypes.body,
+      Color? textColor,
+      FontWeight? fontWeight,
+      Color? bgColor,
+      double? height}) {
     double size = 0;
     switch (textType) {
       case TextTypes.small:
@@ -42,7 +48,7 @@ class AppTypography extends StatelessWidget {
         break;
     }
 
-    final color = textColor ?? textColor;
+    final color = textColor ?? appTextColor;
     return TextStyle(
         fontSize: size,
         fontWeight: fontWeight,
@@ -54,7 +60,12 @@ class AppTypography extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle = _generateTextStyle(context);
+    TextStyle textStyle = generateTextStyle(
+        textType: textType,
+        textColor: textColor,
+        fontWeight: fontWeight,
+        bgColor: bgColor,
+        height: height);
     return Text(
       text,
       textDirection: TextDirection.ltr,

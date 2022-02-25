@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/helpers.dart';
+import 'package:flutter_app/screens/intro_screen.dart';
+import 'package:flutter_app/widgets/Page.dart';
+import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/text_input.dart';
 import 'package:flutter_app/widgets/typography.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -57,11 +60,14 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-        body: Center(
-            // Center is a layout widget. It takes a single child and positions it
-            // in the middle of the parent.
-            child: Column(
+    return IntroScreen();
+  }
+}
+
+
+/**
+ * AppPage(
+        child: Column(
       children: [
         Helpers.createSpacer(x: 10),
         const TextInput(
@@ -73,11 +79,23 @@ class _MyHomePageState extends State<MyHomePage> {
         Helpers.createSpacer(x: 10),
         const AppTypography(text: "Text"),
         Helpers.createSpacer(x: 10),
-        const TextInput(
-          label: "Label",
-        ),
+        AppButton("Hello",
+            onTapped: () {},
+            buttonType: ButtonType.secondary,
+            left: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(25)),
+                    color: Colors.white,
+                    border: Border.all(color: secondaryColor, width: 1)),
+                child: const Center(
+                  child: Icon(
+                    Icons.mail,
+                    color: secondaryColor,
+                  ),
+                )))
       ],
-    )) // This trailing comma makes auto-formatting nicer for build methods.
+    ) // This trailing comma makes auto-formatting nicer for build methods.
         );
-  }
-}
+ */
