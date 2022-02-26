@@ -74,9 +74,7 @@ class IntroScreen extends StatelessWidget {
               Helpers.createSpacer(y: 20),
               AppButton(
                 text: login,
-                onTapped: () {
-                  Navigator.of(context).pushNamed("/login");
-                },
+                onTapped: () {},
                 borderColor: Colors.white,
                 buttonColor: Colors.white,
                 buttonBgColor: Colors.transparent,
@@ -86,7 +84,7 @@ class IntroScreen extends StatelessWidget {
               AppButton(
                 text: createAnAccount,
                 onTapped: () {
-                  Navigator.of(context).pushNamed("/signup");
+                  Navigator.of(context).pushNamed("/sign-up");
                 },
                 borderColor: primaryColor,
                 buttonColor: primaryColor,

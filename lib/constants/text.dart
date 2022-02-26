@@ -5,7 +5,7 @@
 const introScreenAmazeCopy =
     "Amaze   We help bridge the gap between celebrities and their fans.";
 
-const login = "login";
+const login = "Login";
 
 const createAnAccount = "Create an Account";
 

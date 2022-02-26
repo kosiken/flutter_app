@@ -12,6 +12,7 @@ class AppButton extends StatelessWidget {
   final Color? borderColor;
   final ButtonType buttonType;
   final double borderRadius;
+  final bool disabled;
 
   final String text;
   final Widget? left;
@@ -27,6 +28,7 @@ class AppButton extends StatelessWidget {
       this.buttonBgColor,
       this.buttonColor,
       this.left,
+      this.disabled = false,
       required this.onTapped,
       this.borderRadius = 27.5,
       this.onLongPressed,
@@ -37,7 +39,11 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = _getColors(context);
     return GestureDetector(
-      onTap: onTapped,
+      onTap: () {
+        if (!disabled) {
+          onTapped();
+        }
+      },
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -71,5 +77,41 @@ class AppButton extends StatelessWidget {
     }
 
     return <Color>[Colors.white, primaryColor, primaryColor];
+  }
+}
+
+class AppIconButton extends StatelessWidget {
+  final IconData iconData;
+  final OnTappedCallback onTapped;
+  final OnLongPressedCallback? onLongPressed;
+  final double? height;
+  final double? width;
+  final double? iconSize;
+  const AppIconButton(
+      {Key? key,
+      required this.onTapped,
+      this.onLongPressed,
+      this.iconSize,
+      this.height,
+      this.width,
+      required this.iconData})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: onTapped,
+        child: Container(
+          margin: const EdgeInsets.only(top: 10),
+          height: height ?? 35,
+          width: width ?? 35,
+          decoration: BoxDecoration(
+              color: chipBgColor, borderRadius: BorderRadius.circular(17.5)),
+          child: Icon(
+            iconData,
+            color: const Color.fromRGBO(0x97, 0x97, 0x97, 1),
+            size: iconSize ?? 15,
+          ),
+        ));
   }
 }

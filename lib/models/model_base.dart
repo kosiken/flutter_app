@@ -9,4 +9,8 @@ abstract class ModelBase {
   String toString() {
     return toJson().toString();
   }
+
+  Map<String, dynamic> toDb() {
+    return {};
+  }
 }

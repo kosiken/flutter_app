@@ -8,6 +8,7 @@ import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/models/category.dart';
 import 'package:flutter_app/models/country_list_model.dart';
 import 'package:flutter_app/models/register_dto.dart';
+import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/modal.dart';
 import 'package:flutter_app/widgets/page.dart';
 import 'package:flutter_app/widgets/button.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_app/widgets/search_modal.dart';
 import 'package:flutter_app/widgets/text_input.dart';
 import 'package:flutter_app/widgets/typography.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:validators/validators.dart';
 
 import '../debug.dart';
@@ -68,7 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     value.addAll(element);
     return value;
   });
-
+  bool isLoading = false;
   void updateValidationError(String key, String value) {
     hasError = value.isNotEmpty;
     validationErrors[key] = value;
@@ -129,10 +131,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
       updateValidationError("password", "Enter a valid password");
     }
 
-    Debug.log(registerDTO);
+    Debug.log("$registerDTO $validationErrors");
     if (hasError) {
       setState(() {});
       return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    var response = await api.register(registerDTO);
+    setState(() {
+      isLoading = false;
+    });
+    if (response.isError) {
+      Helpers.showSnackBar(context, "An error occurred while signing up");
+    } else {
+      Debug.log(response.result);
+      Provider.of<AppState>(context, listen: false).user = response.result!;
+      Navigator.pushNamed(context, '/onboarding');
     }
   }
 
@@ -207,13 +223,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
     return AppPage(
         scaffoldKey: _scaffoldKey,
         child: SafeArea(
             child: SingleChildScrollView(
                 child: Column(
           children: [
-            Helpers.createSpacer(y: 15),
+            Row(
+              children: [
+                AppIconButton(
+                    onTapped: () {}, iconData: Icons.chevron_left, iconSize: 20)
+              ],
+            ),
+            Helpers.createSpacer(y: 5),
             const Image(
               image: AssetImage("assets/mail.png"),
               height: 75,
@@ -242,9 +265,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onChange: (text) {
                 celebrityAKA = text;
                 if (text.isEmpty) {
-                  validationErrors["celebrityAKA"] = "Please Enter AKA";
+                  updateValidationError("celebrityAKA", "Please Enter AKA");
                 } else {
-                  validationErrors["celebrityAKA"] = "";
+                  updateValidationError("celebrityAKA", "");
                 }
                 setState(() {});
               },
@@ -256,9 +279,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onChange: (text) {
                 email = text;
                 if (text.isEmpty || !isEmail(text)) {
-                  validationErrors["email"] = "Enter a valid email";
+                  updateValidationError("email", "Enter a valid email");
                 } else {
-                  validationErrors["email"] = "";
+                  updateValidationError("email", "");
                 }
                 setState(() {});
               },
@@ -287,10 +310,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onChange: (text) {
                     phoneNumber = text;
                     if (text.length < 10) {
-                      validationErrors["phoneNumber"] =
-                          "Input valid phone number";
+                      updateValidationError(
+                          "phoneNumber", "Input valid phone number");
                     } else {
-                      validationErrors["phoneNumber"] = "";
+                      updateValidationError("phoneNumber", "");
                     }
                     setState(() {});
                   },
@@ -303,9 +326,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onChange: (text) {
                 countryOfResidence = text;
                 if (text.isEmpty) {
-                  validationErrors["countryOfResidence"] = "Enter a Country";
+                  updateValidationError(
+                      "countryOfResidence", "Enter a Country");
                 } else {
-                  validationErrors["countryOfResidence"] = "";
+                  updateValidationError("countryOfResidence", "");
                 }
                 setState(() {});
               },
@@ -317,9 +341,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onChange: (text) {
                 city = text;
                 if (text.isEmpty) {
-                  validationErrors["city"] = "Enter a City";
+                  updateValidationError("city", "Enter a City");
                 } else {
-                  validationErrors["city"] = "";
+                  updateValidationError("city", "");
                 }
                 setState(() {});
               },
@@ -357,7 +381,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 setState(() {});
               },
             ),
-            Helpers.createSpacer(y: 25),
+            Helpers.createSpacer(y: 15),
             Wrap(
               spacing: 8.0,
               runSpacing: 8,
@@ -376,28 +400,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   )
                   .toList(),
             ),
-            RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                    style: AppTypography.generateTextStyle(),
-                    children: const <TextSpan>[
-                      TextSpan(
-                        text: termsText,
-                      ),
-                      TextSpan(
-                          text: termsOfService,
-                          style: TextStyle(
-                              color: primaryColor,
-                              decoration: TextDecoration.underline)),
-                      TextSpan(text: and),
-                      TextSpan(
-                          text: privacyPolicy,
-                          style: TextStyle(
-                              color: primaryColor,
-                              decoration: TextDecoration.underline)),
-                    ])),
+            Helpers.createSpacer(y: 25),
+            Center(
+              child: SizedBox(
+                width: 300,
+                child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                        style: AppTypography.generateTextStyle(),
+                        children: const <TextSpan>[
+                          TextSpan(
+                            text: termsText,
+                          ),
+                          TextSpan(
+                              text: " $termsOfService",
+                              style: TextStyle(
+                                  color: primaryColor,
+                                  decoration: TextDecoration.underline)),
+                          TextSpan(text: " $and"),
+                          TextSpan(
+                              text: " $privacyPolicy",
+                              style: TextStyle(
+                                  color: primaryColor,
+                                  decoration: TextDecoration.underline)),
+                        ])),
+              ),
+            ),
             Helpers.createSpacer(y: 25),
             AppButton(
+                disabled: isLoading,
+                child: isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ))
+                    : null,
                 text: continueText,
                 onTapped: submit,
                 buttonType: ButtonType.secondary,
@@ -565,21 +602,11 @@ class _CategoryListWidgetState extends State<CategoryListWidget> {
           children: [
             Row(
               children: [
-                GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      height: 35,
-                      width: 35,
-                      decoration: BoxDecoration(
-                          color: chipBgColor,
-                          borderRadius: BorderRadius.circular(17.5)),
-                      child: const Icon(
-                        Icons.close,
-                        color: Color.fromRGBO(0x97, 0x97, 0x97, 1),
-                        size: 15,
-                      ),
-                    )),
+                AppIconButton(
+                    onTapped: () {
+                      Navigator.pop(context);
+                    },
+                    iconData: Icons.close),
               ],
               mainAxisAlignment: MainAxisAlignment.end,
             ),
@@ -659,3 +686,10 @@ class _CategoryListWidgetState extends State<CategoryListWidget> {
         ));
   }
 }
+
+
+/*
+{code: 200, isError: false, message: Sign Up Successful, result: {token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYjdmNjQwY2YtODA3OS00Y2FjLTg3ZGQtM2YwMDAwNDBhOTAyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQ3VzdG9tZXIiLCJleHAiOjE2NTEwODgwNjQsImlzcyI6Imh0dHBzOi8vYW1hemUuYWZyaWNhLyIsImF1ZCI6ImFtYXplfGFmcmljYXx1c2VycyJ9.ltDDWkRlfyfYfXhiQdIGKi3xThVh4100-9IS9PhefMg, expiry: 2022-05-17T19:34:24.8147447+00:00, user: {id: b7f640cf-8079-4cac-87dd-3f000040a902, email: allisonkony@gmail.com, firstName: Kosy, lastName: Allison, phoneNumber: +2348146392214, location: Lagos, Nigeria, userType: 0, celebrityClass: 0, emailConfirmed: false, cards: [], available: false, walletBallance: 0, wishlist: [], celebrityOffersService: false, averageRating: 0, approvalStatus: 0, status: 0}}}
+flutter: [ APPDEBUG ] {isError: false, message: Sign Up Successful, code: 200, result: {id: b7f640cf-8079-4cac-87dd-3f000040a902, firstName: Kosy, lastName: Allison, aka: null, image: null, email: allisonkony@gmail.com, phoneNumber: +2348146392214, location: Lagos, Nigeria}}
+
+*/

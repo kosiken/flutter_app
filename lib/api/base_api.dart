@@ -27,7 +27,9 @@ class ApiResponse<T> {
 }
 
 class BaseApi {
-  final dio = Dio(BaseOptions(baseUrl: devUrl));
+  final dio = Dio(
+    BaseOptions(baseUrl: devUrl, contentType: 'application/json'),
+  );
   String? _token;
   DateTime? _expiry;
   final Storage storage;
