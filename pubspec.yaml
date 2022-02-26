@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/donjazzy.png
     - assets/mail.png
+    - assets/countries.json
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
