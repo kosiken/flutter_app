@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/models/category.dart';
+import 'package:flutter_app/models/person.dart';
+import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/typography.dart';
+import 'package:provider/provider.dart';
 
 class PageOne extends StatefulWidget {
   final List<Category> categories;
@@ -16,12 +19,14 @@ class PageOne extends StatefulWidget {
 
 class _PageOneState extends State<PageOne> {
   List<Category> categories = [];
+  Person? _person;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     categories.addAll(widget.categories);
+    _person = Provider.of<AppState>(context).user!;
     setState(() {});
   }
 
@@ -30,9 +35,10 @@ class _PageOneState extends State<PageOne> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          Row(children: const [
+          Row(children: [
             AppTypography(
-              text: "Perfect Ademola 😎️,",
+              text:
+                  "Perfect ${Helpers.shortenText(_person?.firstName ?? "")} 😎️,",
               textType: TextTypes.header,
               fontWeight: FontWeight.w700,
               fontSize: 18,
@@ -42,7 +48,7 @@ class _PageOneState extends State<PageOne> {
           ]),
           Row(children: const [
             AppTypography(
-              text: "Getting closer to meeting your fans",
+              text: "We are almost there!!",
               fontSize: 18,
               textType: TextTypes.header,
               fontWeight: FontWeight.w700,
@@ -51,8 +57,7 @@ class _PageOneState extends State<PageOne> {
           ]),
           Helpers.createSpacer(y: 10),
           const AppTypography(
-            text:
-                "Please select a maximum of 5 secondary celebrity category that your fans can use to identify you",
+            text: "Please select the service(s) you choose to offer on Amaze",
             textColor: secondaryColor,
           ),
           Helpers.createSpacer(y: 30),

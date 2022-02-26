@@ -75,7 +75,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Expanded(
                     child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: PageOne(categories: categories)))
+                        child: Column(
+                          children: [
+                            Row(children: const [
+                              AppTypography(
+                                text: "Perfect Ademola 😎️,",
+                                textType: TextTypes.header,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18,
+                                textAlign: TextAlign.start,
+                                textColor: secondaryDarker,
+                              )
+                            ]),
+                            Row(children: const [
+                              AppTypography(
+                                text: "Getting closer to meeting your fans",
+                                fontSize: 18,
+                                textType: TextTypes.header,
+                                fontWeight: FontWeight.w700,
+                                textColor: secondaryDarker,
+                              )
+                            ]),
+                            Helpers.createSpacer(y: 10),
+                            const AppTypography(
+                              text:
+                                  "Please select a maximum of 5 secondary celebrity category that your fans can use to identify you",
+                              textColor: secondaryColor,
+                            ),
+                          ],
+                        )))
               ],
               crossAxisAlignment: CrossAxisAlignment.start,
             )));
