@@ -35,20 +35,20 @@ class _SearchModalState<T extends Listable> extends State<SearchModal<T>> {
     return Modal(
         height: widget.height,
         borderRadius: 20,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
         child: Column(
           children: [
             AppTextInput(
               label: "Enter Country Name",
               onChange: (text) {
+                matches.clear();
                 if (text.isNotEmpty) {
-                  matches = widget.models
-                      .where((model) => model.toString().contains(text))
-                      .toList()
-                      .cast<T>();
+                  matches.addAll(widget.models
+                      .where((model) => model.toString().contains(text)));
                 } else {
-                  matches = widget.models;
+                  matches.addAll(widget.models);
                 }
+                setState(() {});
               },
             ),
             Expanded(
@@ -57,13 +57,20 @@ class _SearchModalState<T extends Listable> extends State<SearchModal<T>> {
                 var item = matches[i];
                 return ListTile(
                   leading: item.leading() != null
-                      ? AppTypography(text: item.leading()!)
+                      ? AppTypography(
+                          text: item.leading()!,
+                          textType: TextTypes.list_tile_text,
+                        )
                       : const SizedBox(),
                   title: AppTypography(
-                      text:
-                          Helpers.shortenText(matches[i].title(), length: 25)),
+                    text: Helpers.shortenText(matches[i].title(), length: 25),
+                    textType: TextTypes.list_tile_text,
+                  ),
                   trailing: item.trailing() != null
-                      ? AppTypography(text: item.trailing()!)
+                      ? AppTypography(
+                          text: item.trailing()!,
+                          textType: TextTypes.list_tile_text,
+                        )
                       : const SizedBox(),
                   onTap: () {
                     widget.onSelect(item);

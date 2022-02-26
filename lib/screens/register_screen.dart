@@ -1,16 +1,20 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/api/rest_api.dart';
 import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/constants/text.dart';
 import 'package:flutter_app/helpers.dart';
+import 'package:flutter_app/models/category.dart';
 import 'package:flutter_app/models/country_list_model.dart';
 import 'package:flutter_app/models/register_dto.dart';
+import 'package:flutter_app/widgets/modal.dart';
 import 'package:flutter_app/widgets/page.dart';
 import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/search_modal.dart';
 import 'package:flutter_app/widgets/text_input.dart';
 import 'package:flutter_app/widgets/typography.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:validators/validators.dart';
 
 import '../debug.dart';
@@ -24,8 +28,12 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   // RegisterDTO registerDTO = RegisterDTO()..firstName = "Lion";
+  final api = RestApi();
   final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>(debugLabel: "Register Screen Scaffold");
+
+  final GlobalKey<AppTextInputState> _categoryKey =
+      GlobalKey<AppTextInputState>(debugLabel: "category Key");
   String countryCode = "+234";
   String firstName = "";
   String lastName = "";
@@ -37,12 +45,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String city = "";
   String password = "";
   List<CountryLisModel> countries = <CountryLisModel>[];
+  List<Category> categories = [];
+  int selectedId = -1;
   // bool modalOpen()
 
   final RegExp capitalLetters = RegExp(r"[A-Z]");
 
   final RegExp smallLetters = RegExp(r"[a-z]");
   final RegExp specialCharacters = RegExp(r"[@$%^*#!\(\)]");
+  bool hasError = false;
   Map<String, String> validationErrors = [
     "firstName",
     "lastName",
@@ -58,8 +69,83 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return value;
   });
 
+  void updateValidationError(String key, String value) {
+    hasError = value.isNotEmpty;
+    validationErrors[key] = value;
+  }
+
   void submit() async {
-    Debug.log(specialCharacters.hasMatch("lion\$"));
+    RegisterDTO registerDTO = RegisterDTO();
+
+    if (firstName.length > 1) {
+      registerDTO.firstName = firstName;
+    } else {
+      updateValidationError("firstName", "First name is required");
+    }
+    if (lastName.length > 1) {
+      registerDTO.lastName = lastName;
+    } else {
+      updateValidationError("lastName", "Last name is required");
+    }
+    if (selectedId > -1) {
+      registerDTO.primaryCelebrityCategory =
+          categories.firstWhere((element) => element.id == selectedId);
+    } else {
+      updateValidationError("primaryCelebrityCategory", "Category is required");
+    }
+    if (celebrityAKA.isNotEmpty) {
+      registerDTO.celebrityAKA = celebrityAKA;
+    } else {
+      updateValidationError("celebrityAKA", "AKA is required");
+    }
+    if (isEmail(email)) {
+      registerDTO.email = email;
+    } else {
+      updateValidationError("email", "Enter a valid email");
+    }
+    if (city.isNotEmpty) {
+      registerDTO.location = "$city";
+    } else {
+      updateValidationError("city", "Enter a valid city name");
+    }
+
+    if (countryOfResidence.isNotEmpty) {
+      registerDTO.location += ", $countryOfResidence";
+    } else {
+      updateValidationError("countryOfResidence", "Enter a valid country name");
+    }
+    if (phoneNumber.length > 9) {
+      registerDTO.phoneNumber =
+          "$countryCode${phoneNumber.length > 10 ? phoneNumber.substring(1) : phoneNumber}";
+    } else {
+      updateValidationError("phoneNumber", "Enter a valid phoneNumber");
+    }
+
+    if (smallLetters.hasMatch(password) &&
+        capitalLetters.hasMatch(password) &&
+        specialCharacters.hasMatch(password)) {
+      registerDTO.password = password;
+    } else {
+      updateValidationError("password", "Enter a valid password");
+    }
+
+    Debug.log(registerDTO);
+    if (hasError) {
+      setState(() {});
+      return;
+    }
+  }
+
+  void loadCategories() async {
+    final response = await api.getCategories(0);
+    if (mounted) {
+      if (response.isError) {
+        Helpers.showSnackBar(context, "An error occurred while loading");
+      } else {
+        categories.addAll(response.result!);
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -67,17 +153,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.initState();
     Debug.log(validationErrors);
     loadCountries();
+    loadCategories();
   }
 
   void loadCountries() async {
     final String countriesJson =
         await Helpers.loadAsset("assets/countries.json");
-
-    setState(() {
-      countries = (List.from(jsonDecode(countriesJson)).map((json) =>
-              CountryLisModel(json["code"]!, json["name"]!, json["flag"]!)))
-          .toList();
-    });
+    if (mounted) {
+      setState(() {
+        countries = (List.from(jsonDecode(countriesJson)).map((json) =>
+                CountryLisModel(json["code"]!, json["name"]!, json["flag"]!)))
+            .toList();
+      });
+    }
   }
 
   void showCountryBottomSheet() {
@@ -90,6 +178,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 setState(() {
                   countryCode = country.code;
                 });
+                Navigator.pop(context);
+              });
+        });
+  }
+
+  void showCategoryBottomSheet() {
+    final controller = _categoryKey.currentState!.controller;
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (c) {
+          return CategoryListWidget(
+              categories: categories,
+              selected: selectedId,
+              onSelect: (category) {
+                updateValidationError("primaryCelebrityCategory", "");
+                setState(() {
+                  selectedId = category.id;
+                  controller.text = category.name;
+                });
+
                 Navigator.pop(context);
               });
         });
@@ -193,7 +302,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               label: "Country Of Residence",
               onChange: (text) {
                 countryOfResidence = text;
-                if (text.isEmpty || !isEmail(text)) {
+                if (text.isEmpty) {
                   validationErrors["countryOfResidence"] = "Enter a Country";
                 } else {
                   validationErrors["countryOfResidence"] = "";
@@ -207,7 +316,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               label: "City",
               onChange: (text) {
                 city = text;
-                if (text.isEmpty || !isEmail(text)) {
+                if (text.isEmpty) {
                   validationErrors["city"] = "Enter a City";
                 } else {
                   validationErrors["city"] = "";
@@ -218,10 +327,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             Helpers.createSpacer(y: 25),
             GestureDetector(
+              onTap: showCategoryBottomSheet,
               child: AppTextInput(
+                  key: _categoryKey,
                   label: "Primary Celebrity Category",
                   padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   disabled: true,
                   warning: validationErrors["primaryCelebrityCategory"]!,
                   right: Container(
@@ -233,7 +344,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: const Icon(
                       Icons.add,
                       color: Colors.white,
-                      size: 18,
+                      size: 16,
                     ),
                   )),
             ),
@@ -247,17 +358,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
             ),
             Helpers.createSpacer(y: 25),
-            Flex(
-              direction: Axis.horizontal,
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8,
               children: [
-                if (capitalLetters.hasMatch(password))
-                  const _PasswordIndicators(text: "Capital Letters"),
-                if (smallLetters.hasMatch(password))
-                  const _PasswordIndicators(text: "Lowercase Letter"),
-                if (specialCharacters.hasMatch(password))
-                  const _PasswordIndicators(text: "Special Characters")
-              ],
+                if (capitalLetters.hasMatch(password)) capitalLettersText,
+                if (smallLetters.hasMatch(password)) smallLettersText,
+                if (specialCharacters.hasMatch(password)) specialCharactersText
+              ]
+                  .map(
+                    (e) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 5,
+                        ),
+                        color: const Color.fromRGBO(41, 155, 1, 0.05),
+                        child: _PasswordIndicators(text: e)),
+                  )
+                  .toList(),
             ),
+            RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                    style: AppTypography.generateTextStyle(),
+                    children: const <TextSpan>[
+                      TextSpan(
+                        text: termsText,
+                      ),
+                      TextSpan(
+                          text: termsOfService,
+                          style: TextStyle(
+                              color: primaryColor,
+                              decoration: TextDecoration.underline)),
+                      TextSpan(text: and),
+                      TextSpan(
+                          text: privacyPolicy,
+                          style: TextStyle(
+                              color: primaryColor,
+                              decoration: TextDecoration.underline)),
+                    ])),
             Helpers.createSpacer(y: 25),
             AppButton(
                 text: continueText,
@@ -368,19 +506,156 @@ class _PasswordIndicators extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color.fromRGBO(41, 155, 1, 0.05),
-      child: Row(children: [
+    return Flex(
+      mainAxisSize: MainAxisSize.min,
+      direction: Axis.horizontal,
+      children: [
         const Icon(
           Icons.check,
           color: greenColor,
+          size: 15,
         ),
-        Helpers.createSpacer(x: 5),
+        Helpers.createSpacer(x: 4),
         AppTypography(
           text: text,
           textType: TextTypes.small,
-        )
-      ]),
+          textColor: greenColor,
+        ),
+        Helpers.createSpacer(x: 1),
+      ],
     );
+  }
+}
+
+class CategoryListWidget extends StatefulWidget {
+  final List<Category> categories;
+  final int selected;
+  final void Function(Category category) onSelect;
+  const CategoryListWidget(
+      {Key? key,
+      required this.categories,
+      required this.selected,
+      required this.onSelect})
+      : super(key: key);
+
+  @override
+  _CategoryListWidgetState createState() => _CategoryListWidgetState();
+}
+
+class _CategoryListWidgetState extends State<CategoryListWidget> {
+  Category? selected;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selected > 0) {
+      setState(() {
+        selected = widget.categories
+            .firstWhere((element) => element.id == widget.selected);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Modal(
+        height: 600,
+        borderRadius: 20,
+        padding: const EdgeInsets.symmetric(horizontal: 25),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 10),
+                      height: 35,
+                      width: 35,
+                      decoration: BoxDecoration(
+                          color: chipBgColor,
+                          borderRadius: BorderRadius.circular(17.5)),
+                      child: const Icon(
+                        Icons.close,
+                        color: Color.fromRGBO(0x97, 0x97, 0x97, 1),
+                        size: 15,
+                      ),
+                    )),
+              ],
+              mainAxisAlignment: MainAxisAlignment.end,
+            ),
+            const Center(
+                child: Image(
+              width: 94,
+              height: 94,
+              image: Svg('assets/category.svg'),
+            )),
+            Helpers.createSpacer(y: 10),
+            const AppTypography(
+              text: primaryCelebrityCategory,
+              textType: TextTypes.header,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              textAlign: TextAlign.center,
+            ),
+            Helpers.createSpacer(y: 10),
+            const Center(
+              child: SizedBox(
+                width: 210,
+                child: AppTypography(
+                  text: pleaseSelectPrimaryCategory,
+                  textType: TextTypes.small,
+                  textAlign: TextAlign.center,
+                  textColor: chipTextColor,
+                ),
+              ),
+            ),
+            Helpers.createSpacer(y: 30),
+            Expanded(
+                child: Wrap(
+              spacing: 10,
+              runSpacing: 15,
+              children: widget.categories.map((e) {
+                bool isSelected =
+                    selected != null ? selected!.id == e.id : false;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selected = e;
+                    });
+                  },
+                  child: Container(
+                    child: AppTypography(
+                      text: e.name,
+                      textColor: isSelected ? primaryColor : chipTextColor,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 11.25, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color:
+                          isSelected ? appTextInputFocusedBgColor : chipBgColor,
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(
+                          color: isSelected ? primaryColor : textInputColor,
+                          width: 1),
+                    ),
+                  ),
+                );
+              }).toList(),
+            )),
+            Helpers.createSpacer(y: 10),
+            AppButton(
+              onTapped: () {
+                if (selected != null) {
+                  widget.onSelect(selected!);
+                } else {
+                  Navigator.pop(context);
+                }
+              },
+              text: selectCategory,
+            ),
+            Helpers.createSpacer(y: 50),
+          ],
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+        ));
   }
 }

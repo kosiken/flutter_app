@@ -11,6 +11,7 @@ RegisterDTO _$RegisterDTOFromJson(Map<String, dynamic> json) => RegisterDTO()
   ..lastName = json['lastName'] as String
   ..celebrityAKA = json['celebrityAKA'] as String
   ..phoneNumber = json['phoneNumber'] as String
+  ..location = json['location'] as String
   ..countryOfResidence = json['countryOfResidence'] as String
   ..email = json['email'] as String
   ..primaryCelebrityCategory = Category.fromJson(
@@ -23,6 +24,7 @@ Map<String, dynamic> _$RegisterDTOToJson(RegisterDTO instance) =>
       'lastName': instance.lastName,
       'celebrityAKA': instance.celebrityAKA,
       'phoneNumber': instance.phoneNumber,
+      'location': instance.location,
       'countryOfResidence': instance.countryOfResidence,
       'email': instance.email,
       'primaryCelebrityCategory':

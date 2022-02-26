@@ -13,6 +13,8 @@ class RegisterDTO extends ModelBase {
   String location = "";
   String countryOfResidence = "";
   String email = "";
+  final String companyName = "No Company";
+  final String jobTitle = "No title";
 
   @JsonKey(toJson: categoryToJson)
   late Category primaryCelebrityCategory;

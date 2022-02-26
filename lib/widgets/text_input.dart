@@ -1,12 +1,11 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/helpers.dart';
+import 'package:flutter_app/models/listable.dart';
 import 'package:flutter_app/widgets/typography.dart';
 import 'package:flutter_app/constants/colors.dart';
 
 typedef InputOnChangeCallback = void Function(String value);
-
-const AppTextInputFocusedBgColor = Color.fromRGBO(0xE6, 0x00, 0x7E, 0.05);
 
 class AppTextInput extends StatefulWidget {
   final String label;
@@ -41,10 +40,10 @@ class AppTextInput extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AppTextInputState createState() => _AppTextInputState();
+  AppTextInputState createState() => AppTextInputState();
 }
 
-class _AppTextInputState extends State<AppTextInput>
+class AppTextInputState extends State<AppTextInput>
     with AfterLayoutMixin<AppTextInput> {
   FocusNode focusNode = FocusNode();
   late TextEditingController controller;
@@ -105,6 +104,7 @@ class _AppTextInputState extends State<AppTextInput>
                   )),
                   widget.right ?? const SizedBox(),
                 ],
+                crossAxisAlignment: CrossAxisAlignment.center,
               ),
             ),
             if (widget.warning.isNotEmpty)
@@ -145,7 +145,7 @@ class _AppTextInputState extends State<AppTextInput>
   _focusChangeColor() {
     setState(() {
       if (focusNode.hasFocus) {
-        bgColor = AppTextInputFocusedBgColor;
+        bgColor = appTextInputFocusedBgColor;
         color = Theme.of(context).primaryColor;
       } else {
         bgColor = Colors.white;
@@ -170,54 +170,3 @@ class _AppTextInputState extends State<AppTextInput>
     });
   }
 }
-
-
-/**
- *   child: Stack(
-        children: [
-          Positioned(
-            child: AppTypography(
-              text: widget.label,
-              textColor: color,
-            ),
-            left: 10,
-            top: 3,
-          ),
-          Column(
-            children: [
-              Row(
-                children: [
-                  widget.left ?? const SizedBox(),
-                  Expanded(
-                      child: TextField(
-                    focusNode: focusNode,
-                    maxLength: widget.maxLength,
-                    enabled: !(widget.disabled!),
-                    controller: widget.controller,
-                    obscureText: widget.secure,
-                    autofocus: false,
-                    decoration: const InputDecoration.collapsed(
-                      hintText: "",
-                    ),
-                    keyboardType: widget.inputType,
-                    onChanged: widget.onChange,
-                  )),
-                  widget.right ?? const SizedBox(),
-                ],
-              ),
-              if (widget.warning != null)
-                Row(
-                  children: [
-                    Icon(Icons.info_outline, color: primaryColor),
-                    AppTypography(
-                      text: widget.warning!,
-                      textColor: primaryColor,
-                    )
-                  ],
-                )
-            ],
-          )
-        ],
-      ),
-    );
- */
