@@ -12,6 +12,7 @@ import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/page.dart';
 import 'package:flutter_app/widgets/text_input.dart';
 import 'package:flutter_app/widgets/typography.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../models/category.dart';
@@ -31,6 +32,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final GlobalKey<AppTextInputState> _inputKey =
       GlobalKey<AppTextInputState>(debugLabel: "Bank Key");
   bool isLoading = false;
+  final Map<String, _InputCategory> data = {
+    "website": _InputCategory("Website (Optional)"),
+    "instagram": _InputCategory("Instagram", asset: "assets/ig.svg"),
+    "twitter": _InputCategory("Twitter", asset: "assets/twitter.svg"),
+    "facebook": _InputCategory("Facebook", asset: "assets/fb.svg")
+  };
   List<Category> categories = [];
   List<CelebrityService> services = [];
 
@@ -99,7 +106,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: Column(
                             children: [
                               const AppTypography(
-                                text: "Finally Ademola 🤙️️,",
+                                text: "Done Ademola ⛱️️,",
                                 textType: TextTypes.header,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 18,
@@ -108,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                               Helpers.createSpacer(y: 10),
                               const AppTypography(
-                                text: "Additional information required",
+                                text: "Personal social accounts",
                                 fontSize: 18,
                                 textType: TextTypes.header,
                                 fontWeight: FontWeight.w700,
@@ -117,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Helpers.createSpacer(y: 10),
                               const AppTypography(
                                   text:
-                                      "Please upload necessary additional information to avoid duplicacy of your identity"),
+                                      "Please enter the url and/or identification for your social media accounts (optional)"),
                               Helpers.createSpacer(y: 30),
                               Row(
                                 children: [
@@ -133,21 +140,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ],
                               ),
                               Helpers.createSpacer(y: 5),
-                              AppTextInput(
-                                  label: "",
-                                  renderLabel: false,
-                                  right: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 5.5, horizontal: 15),
-                                    margin: const EdgeInsets.only(left: 10),
-                                    decoration: BoxDecoration(
-                                        color: greenColor,
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: const AppTypography(
-                                      text: "Upload",
-                                      textColor: Colors.white,
+                              ...data.keys.map((e) {
+                                String? asset = data[e]!.asset;
+                                var left = asset == null
+                                    ? SizedBox()
+                                    : Padding(
+                                        padding: EdgeInsets.only(right: 10),
+                                        child: Image(
+                                          image: Svg(asset),
+                                          height: 20,
+                                          width: 20,
+                                        ));
+                                return Column(
+                                  children: [
+                                    AppTypography(
+                                      text: data[e]!.label,
+                                      textColor: chipTextColor,
                                     ),
-                                  )),
+                                    AppTextInput(
+                                      label: "",
+                                      renderLabel: false,
+                                      left: left,
+                                    ),
+                                    Helpers.createSpacer(y: 20)
+                                  ],
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                );
+                              }).toList(),
                               Helpers.createSpacer(y: 52),
                               AppButton(
                                 onTapped: () {},
@@ -162,4 +181,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
             )));
   }
+}
+
+class _InputCategory {
+  final String label;
+  String? value;
+  final String? asset;
+  _InputCategory(
+    this.label, {
+    this.value,
+    this.asset,
+  });
 }
