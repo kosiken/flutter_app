@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_app/api/api_constants.dart';
 import 'package:flutter_app/api/local_storage.dart';
+import 'package:flutter_app/debug.dart';
 
 class ApiResponse<T> {
   final T? result;
@@ -38,6 +39,7 @@ class BaseApi {
 
   Future<void> init() async {
     _token = await storage.getItem("token");
+    Debug.log(_token);
 
     String? expiry = await storage.getItem("expiry");
     if (expiry != null) {
@@ -51,4 +53,8 @@ class BaseApi {
     await storage.setItem("expiry", expiry);
     await storage.setItem("token", token);
   }
+
+  void printToken() => Debug.log(_token);
+
+  String? get token => _token;
 }

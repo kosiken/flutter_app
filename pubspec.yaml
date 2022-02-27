@@ -75,6 +75,17 @@ flutter:
     - assets/mail.png
     - assets/countries.json
     - assets/category.svg
+    - assets/badge.svg
+    - assets/document.svg
+    - assets/fb.svg
+    - assets/gift.svg
+    - assets/ig.svg
+    - assets/notes.svg
+    - assets/privacy.svg
+    - assets/rocket.svg
+    - assets/ticket.svg
+    - assets/twitter.svg
+    
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

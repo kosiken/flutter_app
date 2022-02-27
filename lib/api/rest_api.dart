@@ -3,6 +3,7 @@ import 'package:flutter_app/api/base_api.dart';
 import 'package:flutter_app/api/local_storage.dart';
 import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/models/category.dart';
+import 'package:flutter_app/models/celebrity_service.dart';
 import 'package:flutter_app/models/person.dart';
 import 'package:flutter_app/models/register_dto.dart';
 
@@ -39,7 +40,7 @@ class RestApi extends BaseApi {
     Response<Map<String, dynamic>>? response;
 
     try {
-      response = await dio.post("/api/User/account/signup", data: dto.toJson());
+      response = await dio.post("/User/account/signup", data: dto.toJson());
       Debug.log(response.data);
 
       final person = Person.fromJson(response.data!["result"]!["user"]);
@@ -57,6 +58,32 @@ class RestApi extends BaseApi {
       Debug.log(e);
 
       return ApiResponse<Person>(
+          isError: true,
+          message: "An error occurred",
+          code: response?.statusCode ?? -1);
+    }
+  }
+
+  Future<ApiResponse<List<CelebrityService>?>> getServices() async {
+    Response<Map<String, dynamic>>? response;
+
+    try {
+      response = await dio.get("/App/amaze/services",
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      return ApiResponse(
+          message: response.data!["message"] as String,
+          isError: response.data!["isError"] as bool,
+          code: response.data!["code"] as int,
+          result: (response.data!["result"] as List<dynamic>)
+              .map((json) => CelebrityService.fromJson(json))
+              .toList()
+              .cast<CelebrityService>());
+    } catch (e) {
+      Debug.log(e);
+
+      return ApiResponse<List<CelebrityService>>(
           isError: true,
           message: "An error occurred",
           code: response?.statusCode ?? -1);

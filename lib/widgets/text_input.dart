@@ -20,6 +20,7 @@ class AppTextInput extends StatefulWidget {
   final int lines;
   final bool? disabled;
   final int? maxLength;
+  final bool renderLabel;
   final InputOnChangeCallback? onChange;
 
   const AppTextInput({
@@ -33,6 +34,7 @@ class AppTextInput extends StatefulWidget {
     this.right,
     this.maxLength,
     this.margin = 0,
+    this.renderLabel = true,
     this.lines = 1,
     this.secure = false,
     this.onChange,
@@ -96,8 +98,8 @@ class AppTextInputState extends State<AppTextInput>
                     controller: controller,
                     obscureText: widget.secure,
                     autofocus: false,
-                    decoration: const InputDecoration.collapsed(
-                      hintText: "",
+                    decoration: InputDecoration.collapsed(
+                      hintText: widget.renderLabel ? "" : widget.label,
                     ),
                     keyboardType: widget.inputType,
                     onChanged: widget.onChange,
@@ -129,15 +131,16 @@ class AppTextInputState extends State<AppTextInput>
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
         ),
-        Positioned(
-          child: AppTypography(
-            text: widget.label,
-            textColor: color,
-            bgColor: Colors.white,
+        if (widget.renderLabel)
+          Positioned(
+            child: AppTypography(
+              text: widget.label,
+              textColor: color,
+              bgColor: Colors.white,
+            ),
+            left: 10,
+            top: -8,
           ),
-          left: 10,
-          top: -8,
-        ),
       ],
     );
   }

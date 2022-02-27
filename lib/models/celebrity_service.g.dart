@@ -6,17 +6,17 @@ part of 'celebrity_service.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CelebrityStatus _$CelebrityStatusFromJson(Map<String, dynamic> json) =>
-    CelebrityStatus(
+CelebrityService _$CelebrityServiceFromJson(Map<String, dynamic> json) =>
+    CelebrityService(
       id: json['id'] as int,
       name: json['name'] as String,
       description: json['description'] as String,
-      businessPrice: (json['businessPrice'] as num).toDouble(),
-      fanPrice: (json['fanPrice'] as num).toDouble(),
-      isFeatured: json['isFeatured'] as bool,
+      businessPrice: (json['businessPrice'] as num?)?.toDouble(),
+      fanPrice: (json['fanPrice'] as num?)?.toDouble(),
+      isFeatured: json['isFeatured'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$CelebrityStatusToJson(CelebrityStatus instance) =>
+Map<String, dynamic> _$CelebrityServiceToJson(CelebrityService instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

@@ -9,23 +9,23 @@ abstract class Storage {
 class DefaultStorage implements Storage {
   SharedPreferences? prefs;
   DefaultStorage._privateConstructor();
-
-  DefaultStorage() {
-    init();
-  }
-  void init() async {
-    prefs = await SharedPreferences.getInstance();
+  Future<void> init() async {
+    if (prefs == null) {
+      prefs = await SharedPreferences.getInstance();
+    }
   }
 
   static final DefaultStorage _instance = DefaultStorage._privateConstructor();
   static DefaultStorage get instance => _instance;
   @override
   Future<String?> getItem(String itemKey) async {
-    return prefs?.getString(itemKey);
+    await init();
+    return prefs!.getString(itemKey);
   }
 
   @override
   Future<void> setItem(String key, String value) async {
-    prefs?.setString(key, value);
+    await init();
+    prefs!.setString(key, value);
   }
 }
