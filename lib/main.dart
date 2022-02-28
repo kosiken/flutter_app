@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     var provider = Provider.of<AppState>(context, listen: false);
     provider.user = user;
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
     if (user != null) {
       Navigator.of(context).pushNamed("/onboarding");
     } else {

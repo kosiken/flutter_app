@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_app/api/base_api.dart';
 import 'package:flutter_app/api/rest_api.dart';
 import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/models/celebrity_service.dart';
-import 'package:flutter_app/models/person.dart';
 import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
-import 'package:flutter_app/screens/onboarding_pages/page_one.dart';
 import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
-import 'package:flutter_app/widgets/page.dart';
 import 'package:flutter_app/widgets/typography.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';

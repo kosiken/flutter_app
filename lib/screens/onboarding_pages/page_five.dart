@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api/rest_api.dart';
 import 'package:flutter_app/constants/colors.dart';
-import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
 import 'package:flutter_app/state.dart';

@@ -29,7 +29,6 @@ class _PageOneState extends State<PageOne> {
   bool isSaving = false;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     loadCategories();
@@ -118,9 +117,9 @@ class _PageOneState extends State<PageOne> {
                   bool isSelected = selected.contains(e.id);
                   return GestureDetector(
                     onTap: () {
-                      if (isSelected)
+                      if (isSelected) {
                         selected.remove(e.id);
-                      else if (selected.length < 5) {
+                      } else if (selected.length < 5) {
                         selected.add(e.id);
                       } else {
                         Helpers.showSnackBar(

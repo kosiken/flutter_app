@@ -6,6 +6,7 @@ part of 'register_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+// ignore: unused_element
 RegisterDTO _$RegisterDTOFromJson(Map<String, dynamic> json) => RegisterDTO()
   ..firstName = json['firstName'] as String
   ..lastName = json['lastName'] as String

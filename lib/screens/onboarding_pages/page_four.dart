@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api/rest_api.dart';
 import 'package:flutter_app/constants/colors.dart';
-import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/models/celebrity_service.dart';
 import 'package:flutter_app/models/person.dart';
@@ -24,11 +23,6 @@ class _PageFourState extends State<PageFour> {
   String warning = "";
   bool isSaving = false;
   RestApi restApi = RestApi();
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   Future<bool> updateProfile() async {
     final state = Provider.of<AppState>(context, listen: false);

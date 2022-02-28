@@ -32,6 +32,7 @@ class BaseApi {
     BaseOptions(baseUrl: devUrl, contentType: 'application/json'),
   );
   String? _token;
+  // ignore: unused_field
   DateTime? _expiry;
   final Storage storage;
 

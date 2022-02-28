@@ -10,9 +10,7 @@ class DefaultStorage implements Storage {
   SharedPreferences? prefs;
   DefaultStorage._privateConstructor();
   Future<void> init() async {
-    if (prefs == null) {
-      prefs = await SharedPreferences.getInstance();
-    }
+    prefs ??= await SharedPreferences.getInstance();
   }
 
   static final DefaultStorage _instance = DefaultStorage._privateConstructor();

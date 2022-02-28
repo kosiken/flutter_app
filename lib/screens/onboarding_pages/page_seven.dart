@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api/rest_api.dart';
 import 'package:flutter_app/constants/colors.dart';
-import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
 import 'package:flutter_app/state.dart';
@@ -156,10 +153,4 @@ class _InputCategory {
     this.asset,
     required this.jsonKey,
   });
-
-  @override
-  String toString() {
-    // TODO: implement toString
-    return "$jsonKey $value";
-  }
 }
