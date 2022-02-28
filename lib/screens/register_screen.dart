@@ -505,7 +505,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Row(
         children: [
           SizedBox(
-            width: 180,
+            width: 150,
             child: AppTextInput(
               label: "First Name",
               onChange: (text) {
@@ -521,7 +521,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           SizedBox(
-            width: 180,
+            width: 150,
             child: AppTextInput(
               label: "Last Name",
               onChange: (text) {
@@ -646,36 +646,39 @@ class _CategoryListWidgetState extends State<CategoryListWidget> {
             ),
             Helpers.createSpacer(y: 30),
             Expanded(
-                child: Wrap(
-              spacing: 10,
-              runSpacing: 15,
-              children: widget.categories.map((e) {
-                bool isSelected =
-                    selected != null ? selected!.id == e.id : false;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selected = e;
-                    });
-                  },
-                  child: Container(
-                    child: AppTypography(
-                      text: e.name,
-                      textColor: isSelected ? primaryColor : chipTextColor,
+                child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 15,
+                children: widget.categories.map((e) {
+                  bool isSelected =
+                      selected != null ? selected!.id == e.id : false;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selected = e;
+                      });
+                    },
+                    child: Container(
+                      child: AppTypography(
+                        text: e.name,
+                        textColor: isSelected ? primaryColor : chipTextColor,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 11.25, horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? appTextInputFocusedBgColor
+                            : chipBgColor,
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                            color: isSelected ? primaryColor : textInputColor,
+                            width: 1),
+                      ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 11.25, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected ? appTextInputFocusedBgColor : chipBgColor,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                          color: isSelected ? primaryColor : textInputColor,
-                          width: 1),
-                    ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             )),
             Helpers.createSpacer(y: 10),
             AppButton(
