@@ -5,7 +5,7 @@ import 'package:flutter_app/models/person.dart';
 import 'db_service.dart';
 
 class AppState with ChangeNotifier {
-  AppState() {}
+  AppState();
   final db = DBService.instance;
   Person? _user;
   CelebrityService? service;

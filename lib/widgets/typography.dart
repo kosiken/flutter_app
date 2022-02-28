@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/debug.dart';
 
+// ignore: constant_identifier_names
 enum TextTypes { body, header, small, list_tile_text }
 
 class AppTypography extends StatelessWidget {

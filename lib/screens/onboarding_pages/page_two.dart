@@ -83,7 +83,7 @@ class _PageTwoState extends State<PageTwo> {
                       right: 0,
                       bottom: 2,
                       child: Container(
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                             color: const Color.fromRGBO(0x11, 0x95, 0xFF, 1),
                             borderRadius: BorderRadius.circular(20)),

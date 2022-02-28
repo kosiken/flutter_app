@@ -106,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       updateValidationError("email", "Enter a valid email");
     }
     if (city.isNotEmpty) {
-      registerDTO.location = "$city";
+      registerDTO.location = city;
     } else {
       updateValidationError("city", "Enter a valid city name");
     }
