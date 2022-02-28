@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
       theme: FlexThemeData.light(colors: schemeLight, scheme: scheme),
       initialRoute: "/",
       routes: {
-        "/": (ctx) => const MyHomePage(),
+        "/": (ctx) => const SplashScreen(),
         "/intro": (ctx) => const IntroScreen(),
         "/sign-up": (ctx) => const RegisterScreen(),
         "/onboarding": (ctx) => const PageOne(),
@@ -63,23 +63,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _SplashScreenState extends State<SplashScreen> {
   final db = DBService.instance;
 
   @override
