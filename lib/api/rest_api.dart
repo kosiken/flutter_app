@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_app/api/base_api.dart';
 import 'package:flutter_app/api/local_storage.dart';
@@ -14,10 +16,36 @@ class RestApi extends BaseApi {
 
   RestApi.withStorage({required Storage storage}) : super(storage: storage);
 
+  Future<ApiResponse<bool>> updateProfile(
+      String id, Map<String, dynamic> fieldsToUpdate) async {
+    Map<String, dynamic> requestBody = {"id": id, ...fieldsToUpdate};
+    Response<Map<String, dynamic>>? response;
+
+    try {
+      response = await dio.put("/User/account/celebrity/update",
+          data: jsonEncode(requestBody),
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      return ApiResponse<bool>(
+          message: response.data!["message"] as String,
+          isError: response.data!["isError"] as bool,
+          code: response.data!["code"] as int,
+          result: response.statusCode == 200);
+    } catch (err) {
+      Debug.log(err);
+      return ApiResponse<bool>(
+        isError: true,
+        message: "An error occurred",
+        code: response?.statusCode ?? -1,
+      );
+    }
+  }
+
   Future<ApiResponse<List<Category>>> getCategories(int type) async {
     Response<Map<String, dynamic>>? response;
     try {
-      response = await dio.get("/api/App/categories/$type");
+      response = await dio.get("/App/categories/$type");
 
       return ApiResponse(
           message: response.data!["message"] as String,

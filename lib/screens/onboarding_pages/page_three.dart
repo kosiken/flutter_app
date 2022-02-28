@@ -7,6 +7,7 @@ import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/models/celebrity_service.dart';
 import 'package:flutter_app/models/person.dart';
+import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
 import 'package:flutter_app/screens/onboarding_pages/page_one.dart';
 import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
@@ -23,6 +24,7 @@ class PageThree extends StatefulWidget {
 
 class _PageThreeState extends State<PageThree> {
   List<CelebrityService> services = [];
+  bool isLoading = false;
   RestApi restApi = RestApi();
   int selected = -1;
   @override
@@ -45,51 +47,57 @@ class _PageThreeState extends State<PageThree> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-        child: Column(
-      children: [
-        Row(children: const [
-          AppTypography(
-            text: "Hooray Ademola 🎉️,",
-            textType: TextTypes.header,
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-            textAlign: TextAlign.start,
-            textColor: secondaryDarker,
-          )
-        ]),
-        Row(children: const [
-          AppTypography(
-            text: "We are almost there!!",
-            fontSize: 18,
-            textType: TextTypes.header,
-            fontWeight: FontWeight.w700,
-            textColor: secondaryDarker,
-          )
-        ]),
-        Helpers.createSpacer(y: 10),
-        const AppTypography(
-          text: "Please select the service(s) you choose to offer on Amaze",
-          textColor: secondaryColor,
-        ),
-        Helpers.createSpacer(y: 30),
-        ...services.map((e) => _ServiceListModel(
-              selected: selected,
-              service: e,
-              onChange: (v) {
-                setState(() {
-                  selected = v;
-                });
+    return OnboardingScreenLayout(
+        asset: "assets/gift.svg",
+        isLoading: isLoading,
+        progress: (3 / 7),
+        child: SingleChildScrollView(
+            child: Column(
+          children: [
+            Row(children: const [
+              AppTypography(
+                text: "Hooray Ademola 🎉️,",
+                textType: TextTypes.header,
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                textAlign: TextAlign.start,
+                textColor: secondaryDarker,
+              )
+            ]),
+            Row(children: const [
+              AppTypography(
+                text: "We are almost there!!",
+                fontSize: 18,
+                textType: TextTypes.header,
+                fontWeight: FontWeight.w700,
+                textColor: secondaryDarker,
+              )
+            ]),
+            Helpers.createSpacer(y: 10),
+            const AppTypography(
+              text: "Please select the service(s) you choose to offer on Amaze",
+              textColor: secondaryColor,
+            ),
+            Helpers.createSpacer(y: 30),
+            ...services.map((e) => _ServiceListModel(
+                  selected: selected,
+                  service: e,
+                  onChange: (v) {
+                    setState(() {
+                      selected = v;
+                    });
+                  },
+                )),
+            Helpers.createSpacer(y: 52),
+            AppButton(
+              onTapped: () {
+                Navigator.pushNamed(context, "/onboarding_page_4");
               },
-            )),
-        Helpers.createSpacer(y: 52),
-        AppButton(
-          onTapped: () {},
-          text: "Save And Continue",
-          buttonType: ButtonType.secondary,
-        )
-      ],
-    ));
+              text: "Save And Continue",
+              buttonType: ButtonType.secondary,
+            )
+          ],
+        )));
   }
 }
 
