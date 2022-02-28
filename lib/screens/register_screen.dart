@@ -71,6 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return value;
   });
   bool isLoading = false;
+  bool fetchingData = true;
   void updateValidationError(String key, String value) {
     hasError = value.isNotEmpty;
     validationErrors[key] = value;
@@ -152,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  void loadCategories() async {
+  Future<void> loadCategories() async {
     final response = await api.getCategories(0);
     if (mounted) {
       if (response.isError) {
@@ -167,12 +168,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    Debug.log(validationErrors);
-    loadCountries();
-    loadCategories();
+    init();
   }
 
-  void loadCountries() async {
+  void init() async {
+    await loadCountries();
+    await loadCategories();
+    setState(() {
+      fetchingData = false;
+    });
+  }
+
+  Future<void> loadCountries() async {
     final String countriesJson =
         await Helpers.loadAsset("assets/countries.json");
     if (mounted) {
@@ -230,6 +237,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: SingleChildScrollView(
                 child: Column(
           children: [
+            if (fetchingData) const LinearProgressIndicator(),
             Row(
               children: [
                 AppIconButton(
@@ -428,7 +436,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             Helpers.createSpacer(y: 25),
             AppButton(
-                disabled: isLoading,
+                disabled: isLoading || fetchingData,
                 child: isLoading
                     ? const Center(
                         child: CircularProgressIndicator(

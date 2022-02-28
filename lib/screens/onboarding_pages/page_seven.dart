@@ -134,7 +134,8 @@ class _PageSevenState extends State<PageSeven> {
                 },
                 text: "Save And Continue",
                 buttonType: ButtonType.secondary,
-              )
+              ),
+              Helpers.createSpacer(y: 25)
             ],
             crossAxisAlignment: CrossAxisAlignment.start,
           ),
