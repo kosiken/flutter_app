@@ -3,8 +3,12 @@ import 'package:flutter_app/constants/colors.dart';
 // import 'package:flutter_app/screens/intro_screen.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter_app/models/person.dart';
+import 'package:flutter_app/screens/done_screen.dart';
 import 'package:flutter_app/screens/intro_screen.dart';
+import 'package:flutter_app/screens/onboarding_pages/page_seven.dart';
+import 'package:flutter_app/screens/onboarding_pages/page_five.dart';
 import 'package:flutter_app/screens/onboarding_pages/page_four.dart';
+import 'package:flutter_app/screens/onboarding_pages/page_six.dart';
 import 'package:flutter_app/screens/onboarding_pages/page_three.dart';
 import 'package:flutter_app/screens/onboarding_pages/page_two.dart';
 import 'package:flutter_app/screens/onboarding_pages/page_one.dart';
@@ -49,7 +53,11 @@ class MyApp extends StatelessWidget {
         "/onboarding": (ctx) => const PageOne(),
         "/onboarding_page_2": (ctx) => const PageTwo(),
         "/onboarding_page_3": (ctx) => const PageThree(),
-        "/onboarding_page_4": (ctx) => const PageFour()
+        "/onboarding_page_4": (ctx) => const PageFour(),
+        "/onboarding_page_5": (ctx) => const PageFive(),
+        "/onboarding_page_6": (ctx) => const PageSix(),
+        "/onboarding_page_7": (ctx) => const PageSeven(),
+        "/done": (ctx) => const DoneScreen(),
       },
     );
   }
@@ -106,51 +114,13 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Row(),
           const AppTypography(text: "Loading"),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          const CircularProgressIndicator(
-            value: .5,
-          )
+          const CircularProgressIndicator()
         ],
         mainAxisAlignment: MainAxisAlignment.center,
       ),
     );
   }
 }
-
-
-/**
- * AppPage(
-        child: Column(
-      children: [
-        Helpers.createSpacer(x: 10),
-        const TextInput(
-          label: "Label",
-          lines: 10,
-          inputType: TextInputType.multiline,
-        ),
-        const AppTypography(text: "Text"),
-        Helpers.createSpacer(x: 10),
-        const AppTypography(text: "Text"),
-        Helpers.createSpacer(x: 10),
-        AppButton("Hello",
-            onTapped: () {},
-            buttonType: ButtonType.secondary,
-            left: Container(
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(25)),
-                    color: Colors.white,
-                    border: Border.all(color: secondaryColor, width: 1)),
-                child: const Center(
-                  child: Icon(
-                    Icons.mail,
-                    color: secondaryColor,
-                  ),
-                )))
-      ],
-    ) // This trailing comma makes auto-formatting nicer for build methods.
-        );
- */

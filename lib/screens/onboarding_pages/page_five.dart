@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/api/rest_api.dart';
 import 'package:flutter_app/constants/colors.dart';
+import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
+import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/text_input.dart';
 import 'package:flutter_app/widgets/typography.dart';
+import 'package:provider/provider.dart';
 
 class PageFive extends StatefulWidget {
   const PageFive({Key? key}) : super(key: key);
@@ -15,11 +19,37 @@ class PageFive extends StatefulWidget {
 
 class _PageFiveState extends State<PageFive> {
   _BankListItem? _bankListItem;
+  RestApi restApi = RestApi();
   bool isLoading = false;
+  String bankAccountNumber = "";
+  bool isSaving = false;
+  String warning = "";
   final GlobalKey<AppTextInputState> _inputKey =
       GlobalKey<AppTextInputState>(debugLabel: "Bank Key");
+
+  Future<bool> updateBank(Map<String, String> json) async {
+    bool ans = false;
+    setState(() {
+      isSaving = true;
+    });
+    await restApi.init();
+
+    final response = await restApi.updateBank(json);
+    if (!response.isError) {
+      ans = response.result!;
+    }
+
+    setState(() {
+      isSaving = false;
+    });
+    return ans;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final state = Provider.of<AppState>(context, listen: false);
+
+    final person = state.user!;
     return OnboardingScreenLayout(
         asset: "assets/rocket.svg",
         isLoading: isLoading,
@@ -27,8 +57,9 @@ class _PageFiveState extends State<PageFive> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const AppTypography(
-                text: "Almost Ademola ⚙️️,",
+              AppTypography(
+                text:
+                    "Almost ${Helpers.shortenText(person.firstName ?? "")} ⚙️️,",
                 textType: TextTypes.header,
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
@@ -85,10 +116,35 @@ class _PageFiveState extends State<PageFive> {
                 inputType: TextInputType.number,
                 label: "Enter account number",
                 renderLabel: false,
+                onChange: (text) {
+                  if (text.length < 10) {
+                    warning = "Enter a valid account number";
+                  } else {
+                    warning = "";
+                  }
+                  bankAccountNumber = text;
+                  setState(() {});
+                },
+                warning: warning,
               ),
               Helpers.createSpacer(y: 52),
               AppButton(
-                onTapped: () {
+                child: isSaving
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ))
+                    : null,
+                onTapped: () async {
+                  if (bankAccountNumber.length < 10) return;
+                  bool ans = await updateBank({
+                    "accountNumber": bankAccountNumber,
+                    "accountName": person.firstName!
+                  });
+                  if (!ans) {
+                    Helpers.showSnackBar(context, "An error occured while");
+                    return;
+                  }
                   Navigator.pushNamed(context, "/onboarding_page_6");
                 },
                 text: "Save And Continue",

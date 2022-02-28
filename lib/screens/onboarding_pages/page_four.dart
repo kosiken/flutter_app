@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/api/rest_api.dart';
 import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/models/celebrity_service.dart';
+import 'package:flutter_app/models/person.dart';
 import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
 import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
@@ -19,18 +21,46 @@ class PageFour extends StatefulWidget {
 
 class _PageFourState extends State<PageFour> {
   bool isLoading = false;
-  CelebrityService? serviceSelected;
   String warning = "";
+  bool isSaving = false;
+  RestApi restApi = RestApi();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+
+  Future<bool> updateProfile() async {
     final state = Provider.of<AppState>(context, listen: false);
-    serviceSelected = state.service!;
+    setState(() {
+      isSaving = true;
+    });
+    bool updated = false;
+
+    final Person person = state.user!;
+    Map<String, dynamic> json = state.service!.toJson();
+    json["celebrityId"] = person.id;
+    json["serviceId"] = state.service!.id;
+    json.remove("id");
+
+    final response = await restApi.updateProfile(person.id, {
+      "serviceInformation": [json]
+    });
+    if (!response.isError) {
+      updated = response.result!;
+    }
+    setState(() {
+      isSaving = false;
+    });
+    return updated;
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = Provider.of<AppState>(context, listen: false);
+
+    final person = state.user!;
+
     return OnboardingScreenLayout(
         asset: "assets/notes.svg",
         isLoading: isLoading,
@@ -38,8 +68,9 @@ class _PageFourState extends State<PageFour> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const AppTypography(
-                text: "Cha-Ching Ademola 💵️,",
+              AppTypography(
+                text:
+                    "Cha-Ching ${Helpers.shortenText(person.firstName ?? "")} 💵️,",
                 textType: TextTypes.header,
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
@@ -63,11 +94,11 @@ class _PageFourState extends State<PageFour> {
                 decoration: BoxDecoration(
                     color: primaryColor,
                     borderRadius: BorderRadius.circular(6)),
-                child: const Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 7.5, horizontal: 12.5),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 7.5, horizontal: 12.5),
                   child: AppTypography(
-                    text: "Video ShoutOut - Fans",
+                    text: state.service!.name,
                     textColor: Colors.white,
                   ),
                 ),
@@ -91,11 +122,16 @@ class _PageFourState extends State<PageFour> {
                       warning = "Input a number";
                     });
                   } else {
-                    serviceSelected = CelebrityService(
-                        id: serviceSelected!.id,
-                        name: serviceSelected!.name,
-                        description: serviceSelected!.description);
-                    Debug.log(serviceSelected);
+                    setState(() {
+                      warning = "";
+                    });
+                    CelebrityService serviceSelected = state.service!;
+                    state.service = CelebrityService(
+                        id: serviceSelected.id,
+                        name: serviceSelected.name,
+                        description: serviceSelected.description,
+                        businessPrice: price,
+                        fanPrice: price);
                   }
                 },
                 renderLabel: false,
@@ -135,7 +171,23 @@ class _PageFourState extends State<PageFour> {
               ),
               Helpers.createSpacer(y: 52),
               AppButton(
-                onTapped: () {
+                child: isSaving
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ))
+                    : null,
+                disabled: isSaving,
+                onTapped: () async {
+                  if (state.service!.businessPrice == null) {
+                    Helpers.showSnackBar(context, "Input a valid price");
+                    return;
+                  }
+                  bool ans = await updateProfile();
+                  if (!ans) {
+                    Helpers.showSnackBar(context, "An error occured while");
+                    return;
+                  }
                   Navigator.pushNamed(context, "/onboarding_page_5");
                 },
                 text: "Save And Continue",

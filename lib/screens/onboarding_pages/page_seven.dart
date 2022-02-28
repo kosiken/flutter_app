@@ -1,11 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_app/api/rest_api.dart';
 import 'package:flutter_app/constants/colors.dart';
+import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
+import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/text_input.dart';
 import 'package:flutter_app/widgets/typography.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:provider/provider.dart';
 
 class PageSeven extends StatefulWidget {
   const PageSeven({Key? key}) : super(key: key);
@@ -16,24 +22,54 @@ class PageSeven extends StatefulWidget {
 
 class _PageSevenState extends State<PageSeven> {
   bool isLoading = false;
+  final RestApi restApi = RestApi();
   final Map<String, _InputCategory> data = {
-    "website": _InputCategory("Website (Optional)"),
-    "instagram": _InputCategory("Instagram", asset: "assets/ig.svg"),
-    "twitter": _InputCategory("Twitter", asset: "assets/twitter.svg"),
-    "facebook": _InputCategory("Facebook", asset: "assets/fb.svg")
+    "website": _InputCategory("Website (Optional)", jsonKey: "websiteUrl"),
+    "instagram": _InputCategory("Instagram",
+        asset: "assets/ig.svg", jsonKey: "instagramUrl"),
+    "twitter": _InputCategory("Twitter",
+        asset: "assets/twitter.svg", jsonKey: "twitterUrl"),
+    "facebook": _InputCategory("Facebook",
+        asset: "assets/fb.svg", jsonKey: "facebookUrl")
   };
+  bool isSaving = false;
+  Future<bool> updateUrls() async {
+    bool ans = false;
+    final state = Provider.of<AppState>(context, listen: false);
+
+    final person = state.user!;
+    setState(() {
+      isSaving = true;
+    });
+    Map<String, String> requestBody = data.map((key, value) {
+      return MapEntry(value.jsonKey, value.value);
+    });
+    await restApi.init();
+    final response = await restApi.updateProfile(person.id, requestBody);
+    if (!response.isError) {
+      ans = response.result!;
+    }
+    setState(() {
+      isSaving = false;
+    });
+    return ans;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final state = Provider.of<AppState>(context, listen: false);
+
+    final person = state.user!;
     return OnboardingScreenLayout(
         asset: "assets/rocket.svg",
         isLoading: isLoading,
-        progress: (5 / 7),
+        progress: (7 / 7),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const AppTypography(
-                text: "Done Ademola ⛱️️,",
+              AppTypography(
+                text:
+                    "Done ${Helpers.shortenText(person.firstName ?? "")} ⛱️️,",
                 textType: TextTypes.header,
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
@@ -74,6 +110,9 @@ class _PageSevenState extends State<PageSeven> {
                       label: "",
                       renderLabel: false,
                       left: left,
+                      onChange: (text) {
+                        data[e]!.value = text;
+                      },
                     ),
                     Helpers.createSpacer(y: 20)
                   ],
@@ -82,8 +121,19 @@ class _PageSevenState extends State<PageSeven> {
               }).toList(),
               Helpers.createSpacer(y: 52),
               AppButton(
-                onTapped: () {
-                  Navigator.pushNamed(context, "/success");
+                child: isSaving
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ))
+                    : null,
+                onTapped: () async {
+                  bool ans = await updateUrls();
+                  if (!ans) {
+                    Helpers.showSnackBar(context, "An error occured while");
+                    return;
+                  }
+                  Navigator.pushNamed(context, "/done");
                 },
                 text: "Save And Continue",
                 buttonType: ButtonType.secondary,
@@ -97,11 +147,19 @@ class _PageSevenState extends State<PageSeven> {
 
 class _InputCategory {
   final String label;
-  String? value;
+  String value;
+  final String jsonKey;
   final String? asset;
   _InputCategory(
     this.label, {
-    this.value,
+    this.value = "",
     this.asset,
+    required this.jsonKey,
   });
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return "$jsonKey $value";
+  }
 }

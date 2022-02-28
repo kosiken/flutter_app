@@ -35,10 +35,34 @@ class RestApi extends BaseApi {
     } catch (err) {
       Debug.log(err);
       return ApiResponse<bool>(
-        isError: true,
-        message: "An error occurred",
-        code: response?.statusCode ?? -1,
-      );
+          isError: true,
+          message: "An error occurred",
+          code: response?.statusCode ?? -1,
+          result: false);
+    }
+  }
+
+  Future<ApiResponse<bool>> updateBank(Map<String, dynamic> requestBody) async {
+    Response<Map<String, dynamic>>? response;
+
+    try {
+      response = await dio.post("/Payment/bank/add",
+          data: jsonEncode(requestBody),
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      return ApiResponse<bool>(
+          message: response.data!["message"] as String,
+          isError: response.data!["isError"] as bool,
+          code: response.data!["code"] as int,
+          result: response.statusCode == 200);
+    } catch (err) {
+      Debug.log((err as DioError).response!.data);
+      return ApiResponse<bool>(
+          isError: true,
+          message: "An error occurred",
+          code: response?.statusCode ?? -1,
+          result: false);
     }
   }
 

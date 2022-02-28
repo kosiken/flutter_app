@@ -595,7 +595,7 @@ class _CategoryListWidgetState extends State<CategoryListWidget> {
   @override
   Widget build(BuildContext context) {
     return Modal(
-        height: 600,
+        height: 650,
         borderRadius: 20,
         padding: const EdgeInsets.symmetric(horizontal: 25),
         child: Column(
