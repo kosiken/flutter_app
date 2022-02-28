@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/constants/colors.dart';
 import 'package:flutter_app/helpers.dart';
 import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
+import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/typography.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class PageTwo extends StatefulWidget {
   const PageTwo({Key? key}) : super(key: key);
@@ -15,17 +17,20 @@ class PageTwo extends StatefulWidget {
 
 class _PageTwoState extends State<PageTwo> {
   bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
+    final person = Provider.of<AppState>(context, listen: false).user!;
     return OnboardingScreenLayout(
         asset: "assets/privacy.svg",
         isLoading: isLoading,
         progress: (2 / 7),
         child: Column(
           children: [
-            Row(children: const [
+            Row(children: [
               AppTypography(
-                text: "Smile Ademola 📸️,",
+                text:
+                    "Smile ${Helpers.shortenText(person.firstName ?? "")} 📸️,",
                 textType: TextTypes.header,
                 fontWeight: FontWeight.w700,
                 fontSize: 18,

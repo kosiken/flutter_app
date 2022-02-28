@@ -13,6 +13,7 @@ import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/page.dart';
 import 'package:flutter_app/widgets/typography.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class PageThree extends StatefulWidget {
@@ -24,9 +25,10 @@ class PageThree extends StatefulWidget {
 
 class _PageThreeState extends State<PageThree> {
   List<CelebrityService> services = [];
-  bool isLoading = false;
+  bool isLoading = true;
   RestApi restApi = RestApi();
-  int selected = -1;
+  // int selected = -1;
+  CelebrityService? selected;
   @override
   void initState() {
     super.initState();
@@ -38,15 +40,17 @@ class _PageThreeState extends State<PageThree> {
     final ApiResponse<List<CelebrityService>?> response =
         await restApi.getServices();
     Debug.log(response.result);
+    isLoading = false;
     if (response.result != null) {
       services.clear();
       services.addAll(response.result!);
-      setState(() {});
     }
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    final person = Provider.of<AppState>(context, listen: false).user!;
     return OnboardingScreenLayout(
         asset: "assets/gift.svg",
         isLoading: isLoading,
@@ -54,9 +58,10 @@ class _PageThreeState extends State<PageThree> {
         child: SingleChildScrollView(
             child: Column(
           children: [
-            Row(children: const [
+            Row(children: [
               AppTypography(
-                text: "Hooray Ademola 🎉️,",
+                text:
+                    "Hooray ${Helpers.shortenText(person.firstName ?? "")} 🎉️,",
                 textType: TextTypes.header,
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
@@ -80,7 +85,7 @@ class _PageThreeState extends State<PageThree> {
             ),
             Helpers.createSpacer(y: 30),
             ...services.map((e) => _ServiceListModel(
-                  selected: selected,
+                  selected: selected?.id ?? -1,
                   service: e,
                   onChange: (v) {
                     setState(() {
@@ -91,6 +96,17 @@ class _PageThreeState extends State<PageThree> {
             Helpers.createSpacer(y: 52),
             AppButton(
               onTapped: () {
+                if (selected == null) {
+                  Fluttertoast.showToast(
+                      msg: "You need to select a service",
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.CENTER,
+                      fontSize: 16.0);
+                  return;
+                } else {
+                  final state = Provider.of<AppState>(context, listen: false);
+                  state.service = selected;
+                }
                 Navigator.pushNamed(context, "/onboarding_page_4");
               },
               text: "Save And Continue",
@@ -104,7 +120,7 @@ class _PageThreeState extends State<PageThree> {
 class _ServiceListModel extends StatelessWidget {
   final CelebrityService service;
   final int selected;
-  final void Function(int id) onChange;
+  final void Function(CelebrityService selectedService) onChange;
   const _ServiceListModel(
       {Key? key,
       required this.selected,
@@ -117,7 +133,7 @@ class _ServiceListModel extends StatelessWidget {
     bool isSelected = selected == service.id;
     return GestureDetector(
       onTap: () {
-        onChange(service.id);
+        onChange(service);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -138,6 +154,7 @@ class _ServiceListModel extends StatelessWidget {
                   text: service.name,
                   fontWeight: FontWeight.bold,
                   textType: TextTypes.header,
+                  textColor: isSelected ? appTextColor : disabledColor,
                 ),
                 Container(
                   padding: const EdgeInsets.all(3),
@@ -159,7 +176,10 @@ class _ServiceListModel extends StatelessWidget {
               ],
             ),
             Helpers.createSpacer(y: 15),
-            AppTypography(text: service.description)
+            AppTypography(
+              text: service.description,
+              textColor: isSelected ? appTextColor : disabledColor,
+            )
           ],
           crossAxisAlignment: CrossAxisAlignment.start,
         ),

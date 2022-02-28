@@ -77,6 +77,7 @@ class _PageOneState extends State<PageOne> {
   @override
   Widget build(BuildContext context) {
     return OnboardingScreenLayout(
+        canPop: false,
         asset: "assets/badge.svg",
         isLoading: isLoading,
         progress: (1 / 7),

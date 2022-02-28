@@ -18,12 +18,14 @@ import 'package:provider/provider.dart';
 class OnboardingScreenLayout extends StatelessWidget {
   final String asset;
   final double progress;
+  final bool canPop;
   final bool isLoading;
   final Widget child;
   const OnboardingScreenLayout(
       {Key? key,
       required this.asset,
       required this.child,
+      this.canPop = true,
       required this.isLoading,
       required this.progress})
       : super(key: key);
@@ -42,7 +44,11 @@ class OnboardingScreenLayout extends StatelessWidget {
                   child: Row(
                     children: [
                       AppIconButton(
-                          onTapped: () {},
+                          onTapped: () {
+                            if (canPop) {
+                              Navigator.of(context).pop();
+                            }
+                          },
                           iconData: Icons.chevron_left,
                           iconSize: 20)
                     ],

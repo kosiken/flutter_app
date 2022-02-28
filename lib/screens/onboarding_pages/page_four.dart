@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/constants/colors.dart';
+import 'package:flutter_app/debug.dart';
 import 'package:flutter_app/helpers.dart';
+import 'package:flutter_app/models/celebrity_service.dart';
 import 'package:flutter_app/screens/onboarding_pages/onboarding_screen_layout.dart';
+import 'package:flutter_app/state.dart';
 import 'package:flutter_app/widgets/button.dart';
 import 'package:flutter_app/widgets/text_input.dart';
 import 'package:flutter_app/widgets/typography.dart';
+import 'package:provider/provider.dart';
 
 class PageFour extends StatefulWidget {
   const PageFour({Key? key}) : super(key: key);
@@ -15,6 +19,16 @@ class PageFour extends StatefulWidget {
 
 class _PageFourState extends State<PageFour> {
   bool isLoading = false;
+  CelebrityService? serviceSelected;
+  String warning = "";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final state = Provider.of<AppState>(context, listen: false);
+    serviceSelected = state.service!;
+  }
+
   @override
   Widget build(BuildContext context) {
     return OnboardingScreenLayout(
@@ -59,9 +73,9 @@ class _PageFourState extends State<PageFour> {
                 ),
               ),
               Helpers.createSpacer(y: 15),
-              const AppTextInput(
+              AppTextInput(
                 label: "Enter preferred amount",
-                left: Padding(
+                left: const Padding(
                   padding: EdgeInsets.only(right: 10, bottom: 5, left: 3),
                   child: AppTypography(
                     text: "₦",
@@ -70,7 +84,22 @@ class _PageFourState extends State<PageFour> {
                   ),
                 ),
                 inputType: TextInputType.number,
+                onChange: (v) {
+                  final price = double.tryParse(v);
+                  if (price == null) {
+                    setState(() {
+                      warning = "Input a number";
+                    });
+                  } else {
+                    serviceSelected = CelebrityService(
+                        id: serviceSelected!.id,
+                        name: serviceSelected!.name,
+                        description: serviceSelected!.description);
+                    Debug.log(serviceSelected);
+                  }
+                },
                 renderLabel: false,
+                warning: warning,
               ),
               Helpers.createSpacer(y: 10),
               Container(
